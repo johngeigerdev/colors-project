@@ -10,6 +10,11 @@ sliders.forEach(slider => {
     slider.addEventListener('input', hslControls);
 
 });
+colorDivs.forEach((div, index) => {
+    div.addEventListener('change', () => {
+        updateTextUI(index);
+    })
+})
 
 //Functions
 //Color Generator using Chroma JS
@@ -22,7 +27,6 @@ function randomColors() {
     colorDivs.forEach((div, index) => {
         const hexText = div.children[0];
         const randomColor = generateHex();
-        console.log(hexText);
         //Add the color to the bg. (the following div will be the .color panel)
         div.style.backgroundColor = randomColor;
         hexText.innerText = randomColor;
@@ -85,6 +89,18 @@ function hslControls(e) {
 
         colorDivs[index].style.backgroundColor = color;
 
+}
+function updateTextUI(index) {
+    const activeDiv = colorDivs[index];
+    const color = chroma(activeDiv.style.backgroundColor);
+    const textHex = activeDiv.querySelector('h2');
+    const icons = activeDiv.querySelectorAll('.controls button');
+    textHex.innerText = color.hex();
+    //check contrast
+    checkTextContrast(color, textHex);
+    for (icon of icons) {
+        checkTextContrast(color, icon);
+    }
 }
 
 randomColors(); 
