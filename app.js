@@ -24,9 +24,14 @@ function generateHex() {
 }
 
 function randomColors() {
+    //generate initial colors array
+    initialColors = [];
+
     colorDivs.forEach((div, index) => {
         const hexText = div.children[0];
         const randomColor = generateHex();
+        //add generated random color to the initialColors array
+        initialColors.push(chroma(randomColor).hex());
         //Add the color to the bg. (the following div will be the .color panel)
         div.style.backgroundColor = randomColor;
         hexText.innerText = randomColor;
@@ -43,6 +48,8 @@ function randomColors() {
 
         colorizeSliders(color, hue, brightness, saturation);
     });
+    //Reset Inputs 
+    resetInputs();
 }
 
 //change text contrast to look nice with background color
@@ -80,14 +87,17 @@ function hslControls(e) {
     const hue = sliders[0];
     const brightness = sliders[1];
     const saturation = sliders[2];
-    const bgColor = colorDivs[index].querySelector("h2").innerText;
-    
+    const bgColor = initialColors[index];
+
     let color = chroma(bgColor)
         .set("hsl.s", saturation.value)
         .set("hsl.l", brightness.value)
         .set("hsl.h", hue.value)
 
         colorDivs[index].style.backgroundColor = color;
+
+        //colorize the sliders/inputs
+        colorizeSliders(color, hue, brightness, saturation);
 
 }
 function updateTextUI(index) {
@@ -102,5 +112,28 @@ function updateTextUI(index) {
         checkTextContrast(color, icon);
     }
 }
+function resetInputs() {
+    const sliders = document.querySelectorAll('.sliders input');
+    sliders.forEach(slider => {
+        if(slider.name === 'hue') {
+            const hueColor = initialColors[slider.getAttribute('data-hue')];
+            const hueValue = chroma(hueColor);
+            //now, to just get the first 2 decimals of the value
+            slider.value = Math.floor(hueValue * 100) /100;
+        }
+        if(slider.name === 'sat') {
+            const satColor = initialColors[slider.getAttribute('data-sat')];
+            const satValue = chroma(satColor);
+            //now, to just get the first 2 decimals of thevalue
+            slider.value = Math.floor(satValue * 100) /100;
+        }
+        if(slider.name === 'brightness') {
+            const brightColor = initialColors[slider.getAttribute('data-bright')];
+            const brightValue = chroma(brightColor);
+            //now, to just get the first 2 decimals of the value
+            slider.value = Math.floor(brightValue * 100) /100;
+        }
+    })
+}
 
-randomColors(); 
+randomColors();   
